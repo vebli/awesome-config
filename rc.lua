@@ -527,15 +527,15 @@ globalkeys = mytable.join(
               {description = "run browser", group = "launcher"}),
     -- Rofi 
     awful.key({ modkey }, "r", function ()
-            os.execute("/home/vebly/.config/rofi/scripts/launcher_t2")
+            os.execute("rofi -show drun")
         end,
         {description = "rofi launcher", group = "launcher"}),
 
-    awful.key({ modkey }, "p", function ()
-            os.execute("/home/vebly/.config/rofi/scripts/powermenu_t1")
-        end,
-        {description = "rofi powermenu", group = "launcher"}),
-
+    -- awful.key({ modkey }, "p", function ()
+    --         os.execute("/home/vebly/.config/rofi/scripts/powermenu_t1")
+    --     end,
+    --     {description = "rofi powermenu", group = "launcher"}),
+    --
 
     -- Default
     --[[ Menubar
