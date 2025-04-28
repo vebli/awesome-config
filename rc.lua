@@ -420,6 +420,10 @@ globalkeys = mytable.join(
         end
     end, {description = "restore minimized", group = "client"}),
 
+    -- Keyboard language
+    awful.key({ modkey }, "g", function () awful.spawn.with_shell("__toggle_kb_lang") end,
+              {description = "Toggle Keyboard Language", group = "hotkeys"}),
+
     -- Dropdown application
     awful.key({ modkey, }, "z", function () awful.screen.focused().quake:toggle() end,
               {description = "dropdown application", group = "launcher"}),
