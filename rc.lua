@@ -16,7 +16,9 @@ require("core.globals")
 require("core.error")
 require("core.startup")
 
-require("ui.theme")
+-- beautiful.init(string.format("%s/.config/awesome/ui/themes/custom/theme.lua", os.getenv("HOME")))
+beautiful.init(string.format("%s/.config/awesome/ui/themes/multicolor/theme.lua", os.getenv("HOME")))
+
 require("ui.bar")
 require("ui.layout")
 require("ui.menu")
@@ -56,7 +58,6 @@ screen.connect_signal("arrange", function(s)
     end
 end)
 
--- Create a wibox for each screen and add it
 awful.screen.connect_for_each_screen(function(s) beautiful.at_screen_connect(s) end)
 
 -- }}}

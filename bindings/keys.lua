@@ -45,31 +45,14 @@ globalkeys = mytable.join(
 --           {description = "destroy all notifications", group = "hotkeys"}),
 
 -- Take a screenshot
--- https://github.com/lcpz/dots/blob/master/bin/screenshot
-    awful.key({ altkey }, "p", function() os.execute("screenshot") end,
-        { description = "take a screenshot", group = "hotkeys" }),
-
     -- X screen locker
-    awful.key({ altkey, "Control" }, "l", function() os.execute(scrlocker) end,
-        { description = "lock screen", group = "hotkeys" }),
+    -- awful.key({ altkey, "Control" }, "l", function() os.execute(scrlocker) end,
+    --     { description = "lock screen", group = "hotkeys" }),
 
     -- Show help
     awful.key({ modkey, }, "s", hotkeys_popup.show_help,
         { description = "show help", group = "awesome" }),
 
-    -- Tag browsing
-    awful.key({ modkey, }, "Left", awful.tag.viewprev,
-        { description = "view previous", group = "tag" }),
-    awful.key({ modkey, }, "Right", awful.tag.viewnext,
-        { description = "view next", group = "tag" }),
-    awful.key({ modkey, }, "Escape", awful.tag.history.restore,
-        { description = "go back", group = "tag" }),
-
-    -- Non-empty tag browsing
-    awful.key({ altkey }, "Left", function() lain.util.tag_view_nonempty(-1) end,
-        { description = "view  previous nonempty", group = "tag" }),
-    awful.key({ altkey }, "Right", function() lain.util.tag_view_nonempty(1) end,
-        { description = "view  previous nonempty", group = "tag" }),
 
     -- Default client focus
     awful.key({ altkey, }, "j",
@@ -111,10 +94,6 @@ globalkeys = mytable.join(
         end,
         { description = "focus right", group = "client" }),
 
-    -- Menu
-    awful.key({ modkey, }, "w", function() awful.util.mymainmenu:show() end,
-        { description = "show main menu", group = "awesome" }),
-
     -- Layout manipulation
     awful.key({ modkey, "Shift" }, "j", function() awful.client.swap.byidx(1) end,
         { description = "swap with next client by index", group = "client" }),
@@ -151,22 +130,22 @@ globalkeys = mytable.join(
         { description = "toggle wibox", group = "awesome" }),
 
     -- On-the-fly useless gaps change
-    awful.key({ altkey, "Control" }, "+", function() lain.util.useless_gaps_resize(1) end,
-        { description = "increment useless gaps", group = "tag" }),
-    awful.key({ altkey, "Control" }, "-", function() lain.util.useless_gaps_resize(-1) end,
-        { description = "decrement useless gaps", group = "tag" }),
+    -- awful.key({ altkey, "Control" }, "+", function() lain.util.useless_gaps_resize(1) end,
+    --     { description = "increment useless gaps", group = "tag" }),
+    -- awful.key({ altkey, "Control" }, "-", function() lain.util.useless_gaps_resize(-1) end,
+    --     { description = "decrement useless gaps", group = "tag" }),
 
     -- Dynamic tagging
-    awful.key({ modkey, "Shift" }, "n", function() lain.util.add_tag() end,
-        { description = "add new tag", group = "tag" }),
-    awful.key({ modkey, "Shift" }, "r", function() lain.util.rename_tag() end,
-        { description = "rename tag", group = "tag" }),
-    awful.key({ modkey, "Shift" }, "Left", function() lain.util.move_tag(-1) end,
-        { description = "move tag to the left", group = "tag" }),
-    awful.key({ modkey, "Shift" }, "Right", function() lain.util.move_tag(1) end,
-        { description = "move tag to the right", group = "tag" }),
-    awful.key({ modkey, "Shift" }, "d", function() lain.util.delete_tag() end,
-        { description = "delete tag", group = "tag" }),
+    -- awful.key({ modkey, "Shift" }, "n", function() lain.util.add_tag() end,
+    --     { description = "add new tag", group = "tag" }),
+    -- awful.key({ modkey, "Shift" }, "r", function() lain.util.rename_tag() end,
+    --     { description = "rename tag", group = "tag" }),
+    -- awful.key({ modkey, "Shift" }, "Left", function() lain.util.move_tag(-1) end,
+    --     { description = "move tag to the left", group = "tag" }),
+    -- awful.key({ modkey, "Shift" }, "Right", function() lain.util.move_tag(1) end,
+    --     { description = "move tag to the right", group = "tag" }),
+    -- awful.key({ modkey, "Shift" }, "d", function() lain.util.delete_tag() end,
+    --     { description = "delete tag", group = "tag" }),
 
     -- Standard program
     awful.key({ modkey, }, "Return", function() awful.spawn(terminal) end,
@@ -203,18 +182,6 @@ globalkeys = mytable.join(
     -- Keyboard language
     awful.key({ modkey }, "g", function() awful.spawn.with_shell("__toggle_kb_lang") end,
         { description = "Toggle Keyboard Language", group = "hotkeys" }),
-
-    -- Dropdown application
-    awful.key({ modkey, }, "z", function() awful.screen.focused().quake:toggle() end,
-        { description = "dropdown application", group = "launcher" }),
-
-    -- Widgets popups
-    awful.key({ altkey, }, "c", function() if beautiful.cal then beautiful.cal.show(7) end end,
-        { description = "show calendar", group = "widgets" }),
-    awful.key({ altkey, }, "h", function() if beautiful.fs then beautiful.fs.show(7) end end,
-        { description = "show filesystem", group = "widgets" }),
-    awful.key({ altkey, }, "w", function() if beautiful.weather then beautiful.weather.show(7) end end,
-        { description = "show weather", group = "widgets" }),
 
     -- Screen brightness
     awful.key({ altkey }, "Up", function() os.execute("brightnessctl set +10%") end,
@@ -259,55 +226,9 @@ globalkeys = mytable.join(
         end,
         { description = "volume 0%", group = "hotkeys" }),
 
-    -- MPD control
-    awful.key({ altkey, "Control" }, "Up",
-        function()
-            os.execute("mpc toggle")
-            beautiful.mpd.update()
-        end,
-        { description = "mpc toggle", group = "widgets" }),
-    awful.key({ altkey, "Control" }, "Down",
-        function()
-            os.execute("mpc stop")
-            beautiful.mpd.update()
-        end,
-        { description = "mpc stop", group = "widgets" }),
-    awful.key({ altkey, "Control" }, "Left",
-        function()
-            os.execute("mpc prev")
-            beautiful.mpd.update()
-        end,
-        { description = "mpc prev", group = "widgets" }),
-    awful.key({ altkey, "Control" }, "Right",
-        function()
-            os.execute("mpc next")
-            beautiful.mpd.update()
-        end,
-        { description = "mpc next", group = "widgets" }),
-    awful.key({ altkey }, "0",
-        function()
-            local common = { text = "MPD widget ", position = "top_middle", timeout = 2 }
-            if beautiful.mpd.timer.started then
-                beautiful.mpd.timer:stop()
-                common.text = common.text .. lain.util.markup.bold("OFF")
-            else
-                beautiful.mpd.timer:start()
-                common.text = common.text .. lain.util.markup.bold("ON")
-            end
-            naughty.notify(common)
-        end,
-        { description = "mpc on/off", group = "widgets" }),
-
-    -- Copy primary to clipboard (terminals to gtk)
-    awful.key({ modkey }, "c", function() awful.spawn.with_shell("xsel | xsel -i -b") end,
-        { description = "copy terminal to gtk", group = "hotkeys" }),
-    -- Copy clipboard to primary (gtk to terminals)
-    awful.key({ modkey }, "v", function() awful.spawn.with_shell("xsel -b | xsel") end,
-        { description = "copy gtk to terminal", group = "hotkeys" }),
-
     -- User programs
     awful.key({ modkey }, "q", function() awful.spawn(browser) end,
-        { description = "run browser", group = "launcher" }),
+        { description = "open browser", group = "launcher" }),
     -- Rofi
     awful.key({ modkey }, "r", function()
             os.execute("rofi -show drun")
@@ -318,25 +239,6 @@ globalkeys = mytable.join(
             os.execute("/home/vebly/.config/rofi/scripts/powermenu.sh awesome")
         end,
         { description = "rofi powermenu", group = "launcher" }),
-
-
-    -- Default
-    --[[ Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"}),
-    --]]
-    -- alternatively use rofi, a dmenu-like application with more features
-    -- check https://github.com/DaveDavenport/rofi for more details
-    --[[ rofi
-    awful.key({ modkey }, "x", function ()
-            os.execute(string.format("rofi -show %s -theme %s",
-            'run', 'dmenu'))
-        end,
-        {description = "show rofi", group = "launcher"}),
-    --]]
-    -- Prompt
-    -- awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
-    --           {description = "run prompt", group = "launcher"}),
 
     awful.key({ modkey }, "x",
         function()

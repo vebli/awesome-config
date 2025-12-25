@@ -1,5 +1,7 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
+local mytable   = awful.util.table or gears.table     -- 4.{0,1} compatibility
+local wibox = require("wibox")
 
 -- {{{ Signals
 

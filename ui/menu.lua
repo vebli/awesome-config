@@ -2,6 +2,7 @@ require("core.globals")
 local awful       = require("awful")
 local freedesktop = require("freedesktop")
 local menubar     = require("menubar")
+local beautiful = require("beautiful")
 
 
 -- Create a launcher widget and a main menu
