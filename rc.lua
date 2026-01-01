@@ -4,11 +4,12 @@ pcall(require, "luarocks.loader")
 local gears = require("gears")
 local awful = require("awful")
 require("awful.autofocus")
-local wibox     = require("wibox")
-local beautiful = require("beautiful")
-local naughty   = require("naughty")
-local lain      = require("lain")
-local mytable   = awful.util.table or gears.table     -- 4.{0,1} compatibility
+local wibox      = require("wibox")
+local beautiful  = require("beautiful")
+local naughty    = require("naughty")
+local lain       = require("lain")
+local tag_groups = require("state.tag_groups")
+local mytable    = awful.util.table or gears.table -- 4.{0,1} compatibility
 
 
 
@@ -29,7 +30,20 @@ require("core.signals")
 
 
 awful.util.terminal = terminal
-awful.util.tagnames = { "1", "2", "3", "4", "5" }
+
+-- Create tags at startup
+awful.screen.connect_for_each_screen(function(s)
+    local names = {}
+
+    for _, group in pairs(tag_groups.groups) do
+        for _, name in ipairs(group) do
+            table.insert(names, name)
+        end
+    end
+
+    awful.tag(names, s, awful.layout.layouts[1])
+    tag_groups.switch(tag_groups.current, s)
+end)
 
 -- {{{ Screen
 

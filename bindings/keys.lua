@@ -1,9 +1,10 @@
-local awful    = require("awful")
-local lain    = require("lain")
-local beautiful = require("beautiful")
-local mytable   = awful.util.table or gears.table     -- 4.{0,1} compatibility
+local awful         = require("awful")
+local lain          = require("lain")
+local beautiful     = require("beautiful")
+local mytable       = awful.util.table or gears.table -- 4.{0,1} compatibility
 local hotkeys_popup = require("awful.hotkeys_popup")
-                      require("awful.hotkeys_popup.keys")
+local tag_groups    = require("state.tag_groups")
+require("awful.hotkeys_popup.keys")
 -- Mouse
 root.buttons(mytable.join(
     awful.button({}, 3, function() awful.util.mymainmenu:toggle() end),
@@ -11,31 +12,31 @@ root.buttons(mytable.join(
     awful.button({}, 5, awful.tag.viewprev)
 ))
 awful.util.taglist_buttons = mytable.join(
-    awful.button({ }, 1, function(t) t:view_only() end),
+    awful.button({}, 1, function(t) t:view_only() end),
     awful.button({ modkey }, 1, function(t)
         if client.focus then client.focus:move_to_tag(t) end
     end),
-    awful.button({ }, 3, awful.tag.viewtoggle),
+    awful.button({}, 3, awful.tag.viewtoggle),
     awful.button({ modkey }, 3, function(t)
         if client.focus then client.focus:toggle_tag(t) end
     end),
-    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
-    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
+    awful.button({}, 4, function(t) awful.tag.viewnext(t.screen) end),
+    awful.button({}, 5, function(t) awful.tag.viewprev(t.screen) end)
 )
 
 awful.util.tasklist_buttons = mytable.join(
-     awful.button({ }, 1, function(c)
-         if c == client.focus then
-             c.minimized = true
-         else
-             c:emit_signal("request::activate", "tasklist", { raise = true })
-         end
-     end),
-     awful.button({ }, 3, function()
-         awful.menu.client_list({ theme = { width = 250 } })
-     end),
-     awful.button({ }, 4, function() awful.client.focus.byidx(1) end),
-     awful.button({ }, 5, function() awful.client.focus.byidx(-1) end)
+    awful.button({}, 1, function(c)
+        if c == client.focus then
+            c.minimized = true
+        else
+            c:emit_signal("request::activate", "tasklist", { raise = true })
+        end
+    end),
+    awful.button({}, 3, function()
+        awful.menu.client_list({ theme = { width = 250 } })
+    end),
+    awful.button({}, 4, function() awful.client.focus.byidx(1) end),
+    awful.button({}, 5, function() awful.client.focus.byidx(-1) end)
 )
 
 -- Keyboard
@@ -45,11 +46,11 @@ globalkeys = mytable.join(
 --           {description = "destroy all notifications", group = "hotkeys"}),
 
 -- Take a screenshot
-    -- X screen locker
-    -- awful.key({ altkey, "Control" }, "l", function() os.execute(scrlocker) end,
-    --     { description = "lock screen", group = "hotkeys" }),
+-- X screen locker
+-- awful.key({ altkey, "Control" }, "l", function() os.execute(scrlocker) end,
+--     { description = "lock screen", group = "hotkeys" }),
 
-    -- Show help
+-- Show help
     awful.key({ modkey, }, "s", hotkeys_popup.show_help,
         { description = "show help", group = "awesome" }),
 
@@ -302,52 +303,80 @@ clientkeys = mytable.join(
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it work on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
-for i = 1, 9 do
+--
+--
+for i = 1, #tag_groups.groups[tag_groups.current] do
     globalkeys = mytable.join(globalkeys,
-        -- View tag only.
+        -- View tag only
         awful.key({ modkey }, "#" .. i + 9,
             function()
                 local screen = awful.screen.focused()
-                local tag = screen.tags[i]
+                local tag = tag_groups.tag_for_index(i, screen)
                 if tag then
                     tag:view_only()
                 end
             end,
-            { description = "view tag #" .. i, group = "tag" }),
-        -- Toggle tag display.
+            { description = "view tag #" .. i .. " of current group", group = "tag" }),
+
+        -- Toggle tag display
         awful.key({ modkey, "Control" }, "#" .. i + 9,
             function()
                 local screen = awful.screen.focused()
-                local tag = screen.tags[i]
+                local tag = tag_groups.tag_for_index(i, screen)
                 if tag then
                     awful.tag.viewtoggle(tag)
                 end
             end,
-            { description = "toggle tag #" .. i, group = "tag" }),
-        -- Move client to tag.
+            { description = "toggle tag #" .. i .. " of current group", group = "tag" }),
+
+        -- Move client to tag
         awful.key({ modkey, "Shift" }, "#" .. i + 9,
             function()
                 if client.focus then
-                    local tag = client.focus.screen.tags[i]
+                    local tag = tag_groups.tag_for_index(i, client.focus.screen)
                     if tag then
                         client.focus:move_to_tag(tag)
                     end
                 end
             end,
-            { description = "move focused client to tag #" .. i, group = "tag" }),
-        -- Toggle tag on focused client.
+            { description = "move focused client to tag #" .. i .. " of current group", group = "tag" }),
+
+        -- Toggle tag on focused client
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
             function()
                 if client.focus then
-                    local tag = client.focus.screen.tags[i]
+                    local tag = tag_groups.tag_for_index(i, client.focus.screen)
                     if tag then
                         client.focus:toggle_tag(tag)
                     end
                 end
             end,
-            { description = "toggle focused client on tag #" .. i, group = "tag" })
+            { description = "toggle focused client on tag #" .. i .. " of current group", group = "tag" })
     )
 end
+
+
+globalkeys = mytable.join(globalkeys,
+    -- Tag group
+    awful.key({ modkey }, "F1", function()
+        local s = awful.screen.focused()
+        if s then
+            tag_groups.switch("General", s)
+        end
+    end),
+    awful.key({ modkey }, "F2", function()
+        local s = awful.screen.focused()
+        if s then
+            tag_groups.switch("Code", s)
+        end
+    end),
+    awful.key({ modkey }, "F3", function()
+        local s = awful.screen.focused()
+        if s then
+            tag_groups.switch("Study", s)
+        end
+    end)
+)
 
 clientbuttons = mytable.join(
     awful.button({}, 1, function(c)

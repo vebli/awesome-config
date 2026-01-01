@@ -5,14 +5,16 @@
 
 --]]
 
-local gears = require("gears")
-local lain  = require("lain")
-local awful = require("awful")
-local wibox = require("wibox")
-local dpi   = require("beautiful.xresources").apply_dpi
+local gears                                     = require("gears")
+local lain                                      = require("lain")
+local awful                                     = require("awful")
+local wibox                                     = require("wibox")
+local beautiful                                     = require("beautiful")
+local dpi                                       = require("beautiful.xresources").apply_dpi
+local tag_groups                                = require("state.tag_groups")
 
-local os = os
-local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
+local os                                        = os
+local my_table                                  = awful.util.table or gears.table -- 4.{0,1} compatibility
 
 local theme                                     = {}
 theme.confdir                                   = os.getenv("HOME") .. "/.config/awesome/ui/themes/multicolor"
@@ -91,12 +93,13 @@ theme.titlebar_maximized_button_focus_inactive  = theme.confdir .. "/icons/title
 theme.titlebar_maximized_button_normal_active   = theme.confdir .. "/icons/titlebar/maximized_normal_active.png"
 theme.titlebar_maximized_button_focus_active    = theme.confdir .. "/icons/titlebar/maximized_focus_active.png"
 
-local markup = lain.util.markup
+local markup                                    = lain.util.markup
 
 -- Textclock
 os.setlocale(os.getenv("LANG")) -- to localize the clock
 local clockicon = wibox.widget.imagebox(theme.widget_clock)
-local mytextclock = wibox.widget.textclock(markup("#7788af", "%A %d %B ") .. markup("#ab7367", ">") .. markup("#de5e1e", " %H:%M "))
+local mytextclock = wibox.widget.textclock(markup("#7788af", "%A %d %B ") ..
+    markup("#ab7367", ">") .. markup("#de5e1e", " %H:%M "))
 mytextclock.font = theme.font
 
 -- Calendar
@@ -113,7 +116,7 @@ theme.cal = lain.widget.cal({
 local fsicon = wibox.widget.imagebox(theme.widget_fs)
 theme.fs = lain.widget.fs({
     notification_preset = { font = "Terminus 10", fg = theme.fg_normal },
-    settings  = function()
+    settings            = function()
         widget:set_markup(markup.fontfg(theme.font, "#80d9d8", string.format("%.1f", fs_now["/"].percentage) .. "% "))
     end
 })
@@ -166,6 +169,9 @@ local bat = lain.widget.bat({
     end
 })
 
+-- Tag group widget
+local tag_group_widget = require("ui.widgets.tag_group_widget")
+
 -- ALSA volume
 local volicon = wibox.widget.imagebox(theme.widget_vol)
 theme.volume = lain.widget.alsa({
@@ -211,7 +217,7 @@ theme.mpd = lain.widget.mpd({
     settings = function()
         mpd_notification_preset = {
             text = string.format("%s [%s] - %s\n%s", mpd_now.artist,
-                   mpd_now.album, mpd_now.date, mpd_now.title)
+                mpd_now.album, mpd_now.date, mpd_now.title)
         }
 
         if mpd_now.state == "play" then
@@ -222,8 +228,8 @@ theme.mpd = lain.widget.mpd({
             artist = "mpd "
             title  = "paused "
         else
-            artist = ""
-            title  = ""
+            artist                 = ""
+            title                  = ""
             --mpdicon:set_image() -- not working in 4.0
             mpdicon._private.image = nil
             mpdicon:emit_signal("widget::redraw_needed")
@@ -244,22 +250,19 @@ function theme.at_screen_connect(s)
     -- end
     -- gears.wallpaper.maximized(wallpaper, s, true)
 
-    -- Tags
-    awful.tag(awful.util.tagnames, s, awful.layout.layouts[1])
-
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     s.mylayoutbox = awful.widget.layoutbox(s)
     s.mylayoutbox:buttons(my_table.join(
-                           awful.button({}, 1, function () awful.layout.inc( 1) end),
-                           awful.button({}, 2, function () awful.layout.set( awful.layout.layouts[1] ) end),
-                           awful.button({}, 3, function () awful.layout.inc(-1) end),
-                           awful.button({}, 4, function () awful.layout.inc( 1) end),
-                           awful.button({}, 5, function () awful.layout.inc(-1) end)))
+        awful.button({}, 1, function() awful.layout.inc(1) end),
+        awful.button({}, 2, function() awful.layout.set(awful.layout.layouts[1]) end),
+        awful.button({}, 3, function() awful.layout.inc(-1) end),
+        awful.button({}, 4, function() awful.layout.inc(1) end),
+        awful.button({}, 5, function() awful.layout.inc(-1) end)))
     -- Create a taglist widget
-    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, awful.util.taglist_buttons)
+    s.mytaglist = awful.widget.taglist(s, tag_groups.tag_filter, awful.util.taglist_buttons)
 
     -- Create a tasklist widget
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
@@ -301,7 +304,7 @@ function theme.at_screen_connect(s)
         layout = wibox.layout.align.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            --s.mylayoutbox,
+            tag_group_widget,
             s.mytaglist,
             s.mypromptbox,
             mpdicon,
@@ -313,7 +316,15 @@ function theme.at_screen_connect(s)
     }
 
     -- Create the bottom wibox
-    s.mybottomwibox = awful.wibar({ position = "bottom", screen = s, border_width = 0, height = dpi(20), bg = theme.bg_normal, fg = theme.fg_normal })
+    s.mybottomwibox = awful.wibar({
+        position = "bottom",
+        screen = s,
+        border_width = 0,
+        height = dpi(20),
+        bg = theme
+            .bg_normal,
+        fg = theme.fg_normal
+    })
 
     -- Add widgets to the bottom wibox
     s.mybottomwibox:setup {
@@ -322,7 +333,7 @@ function theme.at_screen_connect(s)
             layout = wibox.layout.fixed.horizontal,
         },
         s.mytasklist, -- Middle widget
-        { -- Right widgets
+        {             -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             s.mylayoutbox,
         },
