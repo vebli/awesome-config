@@ -289,7 +289,7 @@ function theme.at_screen_connect(s)
     }
     if has_battery() then
         table.insert(right_widgets, baticon)
-        table.insert(right_widgets, bat.widgets)
+        table.insert(right_widgets, bat.widget)
     end
 
     table.insert(right_widgets, clockicon)
