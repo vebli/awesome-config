@@ -103,7 +103,7 @@ mytextclock.font = theme.font
 theme.cal = lain.widget.cal({
     attach_to = { mytextclock },
     notification_preset = {
-        font = "Terminus 10",
+        font = theme.font,
         fg   = theme.fg_normal,
         bg   = theme.bg_normal
     }
@@ -111,12 +111,26 @@ theme.cal = lain.widget.cal({
 
 -- / fs
 local fsicon = wibox.widget.imagebox(theme.widget_fs)
-theme.fs = lain.widget.fs({
-    notification_preset = { font = "Terminus 10", fg = theme.fg_normal },
-    settings  = function()
-        widget:set_markup(markup.fontfg(theme.font, "#80d9d8", string.format("%.1f", fs_now["/"].percentage) .. "% "))
-    end
-})
+theme.fs = {
+    widget = wibox.widget.textbox()
+}
+
+awful.widget.watch(
+    [[sh -c "df -P / | tail -1 | awk '{print $5}'"]],
+    60,
+    function(widget, stdout)
+        local pct = stdout:gsub("%%", ""):gsub("%s+", "")
+
+        widget:set_markup(
+            markup.fontfg(
+                theme.font,
+                "#80d9d8",
+                pct .. "% "
+            )
+        )
+    end,
+    theme.fs.widget
+)
 
 
 -- CPU
